@@ -13,16 +13,6 @@
 
 <!-- ## **Responsive Design 📱**
 
-<div>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/home-screen.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/call-history.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/incoming-call.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/ongoing-call.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/chat-view.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/reaction-and-unsend-feature.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/add-caption-on-photo.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/chat-details.png"/>
-</div>
 
 
 --- -->
