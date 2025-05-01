@@ -258,18 +258,8 @@ Contributions are welcome! To contribute:
 
 ---
 
-## **📧 Contact**  
-For feedback or queries, reach out:  
-🔗 **[LinkedIn @Rishi Bakshi](https://www.linkedin.com/in/rishi-bakshi/)**
-<br/>
-📩 **[rishibakshiofficial@gmail.com](mailto:rishibakshiofficial@gmail.com)**  
+ 
 
 ---
 
-![GitHub Repo stars](https://img.shields.io/github/stars/RishiBakshii/nextjs-chat-app?style=social)  
-![GitHub forks](https://img.shields.io/github/forks/RishiBakshii/nextjs-chat-app?style=social)  
-![GitHub issues](https://img.shields.io/github/issues/RishiBakshii/nextjs-chat-app)  
-![GitHub license](https://img.shields.io/github/license/RishiBakshii/nextjs-chat-app)  
-![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)  
 
----
