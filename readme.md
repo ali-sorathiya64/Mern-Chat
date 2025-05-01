@@ -134,7 +134,7 @@ At [Mernchat](https://mernchat.in), i am committed to transparency and security.
 
 ### **1️⃣ Clone the Repository**  
 ```bash
-git clone https://github.com/RishiBakshii/nextjs-chat-app
+git clone https://github.com/ali-sorathiya64/Mern-Chat.git
 cd nextjs-chat-app
 ```
 
