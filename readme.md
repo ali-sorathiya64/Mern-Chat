@@ -3,26 +3,10 @@
 **[Mernchat](https://mernchat.in)** is a **secure, real-time messaging platform** built with **Next.js 15, Socket.IO, and end-to-end encryption (E2EE)** to ensure **privacy-first communication**. Designed for seamless **group chats, reactions, file sharing, and OAuth login**, this app is the perfect solution for **secure online conversations**.
 
 
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/og/og-image.png)
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/dekstop-screenshots/group-chat-creation.png)  
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/dekstop-screenshots/recent-calls.png)
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/dekstop-screenshots/poll-creation.png)  
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/dekstop-screenshots/sending-gif.png)  
-![Next.js-chat-app Screenshot](next-js-frontend/public/images/dekstop-screenshots/uploading-attachments.png)
 
 
 <!-- ## **Responsive Design 📱**
 
-<div>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/home-screen.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/call-history.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/incoming-call.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/ongoing-call.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/chat-view.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/reaction-and-unsend-feature.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/add-caption-on-photo.png"/>
-<img style="object-fit: contain;" src="next-js-frontend/public/images/mobile-screenshots/chat-details.png"/>
-</div>
 
 
 --- -->
@@ -150,7 +134,7 @@ At [Mernchat](https://mernchat.in), i am committed to transparency and security.
 
 ### **1️⃣ Clone the Repository**  
 ```bash
-git clone https://github.com/RishiBakshii/nextjs-chat-app
+git clone https://github.com/ali-sorathiya64/Mern-Chat.git
 cd nextjs-chat-app
 ```
 
@@ -274,18 +258,8 @@ Contributions are welcome! To contribute:
 
 ---
 
-## **📧 Contact**  
-For feedback or queries, reach out:  
-🔗 **[LinkedIn @Rishi Bakshi](https://www.linkedin.com/in/rishi-bakshi/)**
-<br/>
-📩 **[rishibakshiofficial@gmail.com](mailto:rishibakshiofficial@gmail.com)**  
+ 
 
 ---
 
-![GitHub Repo stars](https://img.shields.io/github/stars/RishiBakshii/nextjs-chat-app?style=social)  
-![GitHub forks](https://img.shields.io/github/forks/RishiBakshii/nextjs-chat-app?style=social)  
-![GitHub issues](https://img.shields.io/github/issues/RishiBakshii/nextjs-chat-app)  
-![GitHub license](https://img.shields.io/github/license/RishiBakshii/nextjs-chat-app)  
-![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)  
 
----
