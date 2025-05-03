@@ -1,4 +1,4 @@
-"use strict";
+export {};
 // export interface IFriend {
 //     _id:Types.ObjectId
 //     user:Types.ObjectId
