@@ -8,7 +8,7 @@
     "start": "cross-env NODE_ENV=PRODUCTION node build/index.js",
     "dev": "concurrently \"tsc -w\" \"cross-env NODE_ENV=DEVELOPMENT nodemon build/index.js\"",
     "ts.check": "tsc --project tsconfig.json",
-    "build": "tsup src/index.ts --format  esm --dts --out-dir build"
+    "build": "rimraf build && tsc"
   },
   "pre-commit": [
     "ts.check",
@@ -59,7 +59,6 @@
     "pre-commit": "^1.2.2",
     "prisma": "^6.6.0",
     "rimraf": "^5.0.7",
-    "tsup": "^8.4.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },
