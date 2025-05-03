@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
@@ -22,7 +23,6 @@ checkEnvVariables();
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: { credentials: true, origin: config.clientUrl } });
-const cookieParser = require('cookie-parser');
 // global
 app.set("io", io);
 // userSocketIds

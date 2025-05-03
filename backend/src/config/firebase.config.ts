@@ -1,5 +1,6 @@
 import admin from "firebase-admin";
-import credentials from "../firebase-admin-cred.json" with { type: "json" };
+import credentials from "../firebase-admin-cred.json";
+
 
 // Define the type for serviceAccount
 const serviceAccount: admin.ServiceAccount = {
