@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import type  { Request, Response } from 'express';
 import { createServer } from 'http';
 import passport from 'passport';
 import { Server } from 'socket.io';
@@ -17,6 +17,7 @@ import userRoutes from './routes/user.router.js';
 
 import { socketAuthenticatorMiddleware } from './middlewares/socket-auth.middleware.js';
 import registerSocketHandlers from './socket/socket.js';
+const express = (await  import ("express")).default;
 
 checkEnvVariables();
 
