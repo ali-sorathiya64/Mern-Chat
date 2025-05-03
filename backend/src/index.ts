@@ -1,5 +1,4 @@
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { config } from './config/env.config.js';
 import { checkEnvVariables, env } from './schemas/env.schema.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
@@ -23,7 +22,7 @@ const cors = (await import('cors')).default;
 const cookieParser = (await import('cookie-parser')).default;
 const morgan = (await import('morgan')).default;
 const passport = (await import('passport')).default;
-
+const {Server} = await import ('socket.io');
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
