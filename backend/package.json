@@ -3,12 +3,13 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=PRODUCTION node build/index.js",
-    "dev": "concurrently \"tsc -w\" \"cross-env NODE_ENV=DEVELOPMENT nodemon build/index.js\"",
-    "ts.check": "tsc --project tsconfig.json",
-    "build": "rimraf build && tsc"
+    "dev": "tsup src/index.ts --watch",
+    "ts.check": "tsc --noEmit",
+    "build": "rimraf build && tsup",
+    "add-build": "git add build"
   },
   "pre-commit": [
     "ts.check",
@@ -58,7 +59,8 @@
     "nodemon": "^3.1.0",
     "pre-commit": "^1.2.2",
     "prisma": "^6.6.0",
-    "rimraf": "^5.0.7",
+    "rimraf": "^5.0.10",
+    "tsup": "^8.4.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },
