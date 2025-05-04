@@ -7,3 +7,7 @@ firebase-admin-cred.json
 .env.production
 .env.development
 build/
+
+.env
+
+*.map
