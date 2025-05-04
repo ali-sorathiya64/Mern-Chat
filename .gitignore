@@ -6,3 +6,4 @@ firebase-admin-cred.json
 .env.local
 .env.production
 .env.development
+build/
