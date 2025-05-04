@@ -8,7 +8,7 @@
     "start": "cross-env NODE_ENV=PRODUCTION node build/index.js",
     "dev": "tsup src/index.ts --watch",
     "ts.check": "tsc --noEmit",
-    "build": "rimraf build && tsup",
+    "build": " tsup",
     "add-build": "git add build"
   },
   "pre-commit": [
