@@ -1,10 +1,6 @@
 import admin from "firebase-admin";
-import dotenv from "dotenv"
-// Parse Firebase credentials from environment variable
-const credentials = JSON.parse(process.env.FIREBASE_ADMIN_CRED!);
+import credentials from "../firebase-admin-cred.json" with { type: "json" };
 
-
-dotenv.config();
 // Define the type for serviceAccount
 const serviceAccount: admin.ServiceAccount = {
   projectId: credentials.project_id,
