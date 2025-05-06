@@ -1,17 +1,20 @@
 import admin from "firebase-admin";
-import credentials from "../firebase-admin-cred.json" with { type: "json" };
 
-// Define the type for serviceAccount
-const serviceAccount: admin.ServiceAccount = {
-  projectId: credentials.project_id,
-  privateKey: credentials.private_key,
-  clientEmail: credentials.client_email,
-};
-
-// Initialize Firebase Admin SDK
 if (!admin.apps.length) {
+  const credString = process.env.FIREBASE_ADMIN_CRED;
+
+  if (!credString) {
+    throw new Error("FIREBASE_ADMIN_CRED not found in environment variables");
+  }
+
+  const credentials = JSON.parse(credString);
+
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert({
+      projectId: credentials.project_id,
+      privateKey: credentials.private_key.replace(/\\n/g, "\n"),
+      clientEmail: credentials.client_email,
+    }),
   });
 }
 
