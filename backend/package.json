@@ -8,7 +8,7 @@
     "start": "NODE_ENV=PRODUCTION node build/index.js",
     "dev": "concurrently \"tsc -w\" \"cross-env NODE_ENV=DEVELOPMENT nodemon build/index.js\"",
     "ts.check": "tsc --project tsconfig.json",
-    "build": "rimraf build && tsc"
+    "build": "rimraf build && tsc && prisma generate --schema=src/prisma/schema.prisma"
   },
   "pre-commit": [
     "ts.check",
