@@ -10,7 +10,7 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
     const { isGroupChat, members, name } = req.body;
     if (isGroupChat === 'true') {
         if (members.length < 2) {
-            return next(new CustomError("Atleast 2 members are required to create group chat", 400));
+            return next(new CustomError("At least 2 members are required to create group chat", 400));
         }
         else if (!name) {
             return next(new CustomError("name is required for creating group chat", 400));
@@ -43,9 +43,7 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
         });
         const populatedChat = await prisma.chat.findUnique({
             where: { id: newChat.id },
-            omit: {
-                avatarCloudinaryPublicId: true,
-            },
+            omit: { avatarCloudinaryPublicId: true },
             include: {
                 ChatMembers: {
                     include: {
@@ -68,9 +66,7 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
                     }
                 },
                 UnreadMessages: {
-                    where: {
-                        userId: req.user.id
-                    },
+                    where: { userId: req.user.id },
                     select: {
                         count: true,
                         message: {
@@ -78,9 +74,7 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
                                 isTextMessage: true,
                                 url: true,
                                 attachments: {
-                                    select: {
-                                        secureUrl: true,
-                                    }
+                                    select: { secureUrl: true }
                                 },
                                 isPollMessage: true,
                                 createdAt: true,
@@ -110,9 +104,7 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
                             }
                         },
                         attachments: {
-                            select: {
-                                secureUrl: true
-                            }
+                            select: { secureUrl: true }
                         },
                         poll: true,
                         reactions: {
@@ -135,26 +127,27 @@ const createChat = asyncErrorHandler(async (req, res, next) => {
                         },
                     }
                 }
-            },
+            }
         });
         const io = req.app.get("io");
         joinMembersInChatRoom({ memberIds, roomToJoin: newChat.id, io });
-        emitEventToRoom({ event: Events.NEW_CHAT, io, room: newChat.id, data: { ...populatedChat, typingUsers: [] } });
-        return res.status(201);
+        emitEventToRoom({
+            event: Events.NEW_CHAT,
+            io,
+            room: newChat.id,
+            data: { ...populatedChat, typingUsers: [] }
+        });
+        return res.status(201).json(populatedChat);
     }
 });
 const getUserChats = asyncErrorHandler(async (req, res, next) => {
     const chats = await prisma.chat.findMany({
         where: {
             ChatMembers: {
-                some: {
-                    userId: req.user.id
-                }
+                some: { userId: req.user.id }
             }
         },
-        omit: {
-            avatarCloudinaryPublicId: true,
-        },
+        omit: { avatarCloudinaryPublicId: true },
         include: {
             ChatMembers: {
                 include: {
@@ -184,9 +177,7 @@ const getUserChats = asyncErrorHandler(async (req, res, next) => {
                             isTextMessage: true,
                             url: true,
                             attachments: {
-                                select: {
-                                    secureUrl: true,
-                                }
+                                select: { secureUrl: true }
                             },
                             isPollMessage: true,
                             createdAt: true,
@@ -216,9 +207,7 @@ const getUserChats = asyncErrorHandler(async (req, res, next) => {
                         }
                     },
                     attachments: {
-                        select: {
-                            secureUrl: true
-                        }
+                        select: { secureUrl: true }
                     },
                     poll: true,
                     reactions: {
@@ -241,7 +230,7 @@ const getUserChats = asyncErrorHandler(async (req, res, next) => {
                     },
                 }
             }
-        },
+        }
     });
     const chatsWithUserTyping = chats.map(chat => ({
         ...chat,
@@ -251,6 +240,9 @@ const getUserChats = asyncErrorHandler(async (req, res, next) => {
 });
 const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
     const { id } = req.params;
+    if (!id) {
+        return next(new CustomError("Chat ID is required", 400));
+    }
     const { members } = req.body;
     const chat = await prisma.chat.findUnique({ where: { id } });
     if (!chat) {
@@ -266,15 +258,11 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
     const areMembersToBeAddedAlreadyExists = await prisma.chatMembers.findMany({
         where: {
             chatId: id,
-            userId: {
-                in: members,
-            },
+            userId: { in: members },
         },
         include: {
             user: {
-                select: {
-                    username: true
-                }
+                select: { username: true }
             }
         }
     });
@@ -282,14 +270,10 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
         return next(new CustomError(`${areMembersToBeAddedAlreadyExists.map(({ user: { username } }) => `${username}`)} already exists in members of this chat`, 400));
     }
     const oldExistingMembers = await prisma.chatMembers.findMany({
-        where: {
-            chatId: id,
-        },
+        where: { chatId: id },
         include: {
             user: {
-                select: {
-                    id: true,
-                }
+                select: { id: true }
             }
         }
     });
@@ -301,11 +285,7 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
         }))
     });
     const newMemberDetails = await prisma.user.findMany({
-        where: {
-            id: {
-                in: members
-            }
-        },
+        where: { id: { in: members } },
         select: {
             id: true,
             username: true,
@@ -317,12 +297,8 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
         }
     });
     const updatedChat = await prisma.chat.findUnique({
-        where: {
-            id: chat.id
-        },
-        omit: {
-            avatarCloudinaryPublicId: true,
-        },
+        where: { id: chat.id },
+        omit: { avatarCloudinaryPublicId: true },
         include: {
             ChatMembers: {
                 include: {
@@ -354,9 +330,7 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
                         }
                     },
                     attachments: {
-                        select: {
-                            secureUrl: true
-                        }
+                        select: { secureUrl: true }
                     },
                     poll: true,
                     reactions: {
@@ -379,24 +353,33 @@ const addMemberToChat = asyncErrorHandler(async (req, res, next) => {
                     },
                 }
             }
-        },
+        }
     });
     const io = req.app.get("io");
-    // join the new members in the chat room
     joinMembersInChatRoom({ io, roomToJoin: chat.id, memberIds: members });
-    // emitting the new chat event to the new members
-    emitEvent({ event: Events.NEW_CHAT, data: { ...updatedChat, typingUsers: [], UnreadMessages: [] }, io, users: members });
-    // emitting the new member added event to the existing members
-    // with new member details
+    emitEvent({
+        event: Events.NEW_CHAT,
+        data: { ...updatedChat, typingUsers: [], UnreadMessages: [] },
+        io,
+        users: members
+    });
     const payload = {
         chatId: chat.id,
         members: newMemberDetails
     };
-    emitEvent({ data: payload, event: Events.NEW_MEMBER_ADDED, io, users: oldExistingMembersIds });
-    return res.status(200);
+    emitEvent({
+        data: payload,
+        event: Events.NEW_MEMBER_ADDED,
+        io,
+        users: oldExistingMembersIds
+    });
+    return res.status(200).json(updatedChat);
 });
 const removeMemberFromChat = asyncErrorHandler(async (req, res, next) => {
     const { id } = req.params;
+    if (!id) {
+        return next(new CustomError("Chat ID is required", 400));
+    }
     const { members } = req.body;
     const chat = await prisma.chat.findUnique({ where: { id } });
     if (!chat) {
@@ -410,9 +393,7 @@ const removeMemberFromChat = asyncErrorHandler(async (req, res, next) => {
         return next(new CustomError("You are not allowed to remove members as you are not the admin of this chat", 400));
     }
     const existingMembers = await prisma.chatMembers.findMany({
-        where: {
-            chatId: id
-        }
+        where: { chatId: id }
     });
     if (existingMembers.length === 3) {
         return next(new CustomError("Minimum 3 members are required in a group chat", 400));
@@ -431,8 +412,6 @@ const removeMemberFromChat = asyncErrorHandler(async (req, res, next) => {
     }
     if (adminLeavingId) {
         let nextAdminId = null;
-        // if admin is leaving the chat
-        // then assign the admin role to the next member
         for (const memberId of existingMemberIds) {
             if (memberId !== adminLeavingId && !members.includes(memberId)) {
                 nextAdminId = memberId;
@@ -457,25 +436,36 @@ const removeMemberFromChat = asyncErrorHandler(async (req, res, next) => {
     const deletedChatPayload = {
         chatId: id
     };
-    emitEvent({ io, event: Events.DELETE_CHAT, users: members, data: deletedChatPayload });
+    emitEvent({
+        io,
+        event: Events.DELETE_CHAT,
+        users: members,
+        data: deletedChatPayload
+    });
     const remainingMembers = existingMemberIds.filter(id => !members.includes(id));
     const payload = {
         chatId: id,
         membersId: members
     };
-    emitEvent({ io, event: Events.MEMBER_REMOVED, data: payload, users: remainingMembers });
-    return res.status(200);
+    emitEvent({
+        io,
+        event: Events.MEMBER_REMOVED,
+        data: payload,
+        users: remainingMembers
+    });
+    return res.status(200).json({ message: "Members removed successfully" });
 });
 const updateChat = asyncErrorHandler(async (req, res, next) => {
     const { id } = req.params;
+    if (!id) {
+        return next(new CustomError("Chat ID is required", 400));
+    }
     const { name } = req.body;
     const avatar = req.file;
     if (!name && !avatar) {
-        return next(new CustomError("Either avatar or name is required for updating a chat, please provide one"));
+        return next(new CustomError("Either avatar or name is required for updating a chat, please provide one", 400));
     }
-    const chat = await prisma.chat.findUnique({
-        where: { id }
-    });
+    const chat = await prisma.chat.findUnique({ where: { id } });
     if (!chat) {
         return next(new CustomError("chat not found", 404));
     }
@@ -484,10 +474,8 @@ const updateChat = asyncErrorHandler(async (req, res, next) => {
     }
     if (avatar) {
         if (chat.avatarCloudinaryPublicId) {
-            // removing old group chat avatar from cloudinary (to free up cloud space)
             await deleteFilesFromCloudinary({ publicIds: [chat.avatarCloudinaryPublicId] });
         }
-        // now uploading the new group chat avatar to cloudinary
         const uploadResult = await uploadFilesToCloudinary({ files: [avatar] });
         if (!uploadResult) {
             return next(new CustomError("Error updating chat avatar", 404));
@@ -508,7 +496,11 @@ const updateChat = asyncErrorHandler(async (req, res, next) => {
     }
     const updatedChat = await prisma.chat.findUnique({
         where: { id },
-        select: { name: true, avatar: true, id: true }
+        select: {
+            name: true,
+            avatar: true,
+            id: true
+        }
     });
     if (!updatedChat) {
         return next(new CustomError("Error updating chat", 404));
@@ -519,7 +511,12 @@ const updateChat = asyncErrorHandler(async (req, res, next) => {
         chatName: updatedChat.name
     };
     const io = req.app.get("io");
-    emitEventToRoom({ io, event: Events.GROUP_CHAT_UPDATE, room: id, data: payload });
-    return res.status(200);
+    emitEventToRoom({
+        io,
+        event: Events.GROUP_CHAT_UPDATE,
+        room: id,
+        data: payload
+    });
+    return res.status(200).json(updatedChat);
 });
 export { addMemberToChat, createChat, getUserChats, removeMemberFromChat, updateChat };

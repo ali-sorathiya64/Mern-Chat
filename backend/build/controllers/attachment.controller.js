@@ -15,23 +15,25 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
     }
     const isExistingChat = await prisma.chat.findUnique({
         where: {
-            id: chatId
+            id: chatId,
         },
         include: {
             ChatMembers: {
                 select: {
                     userId: true,
-                }
-            }
-        }
+                },
+            },
+        },
     });
     if (!isExistingChat) {
         return next(new CustomError("Chat not found", 404));
     }
     const attachments = req.files;
-    const invalidFiles = attachments.filter(file => !ACCEPTED_FILE_MIME_TYPES.includes(file.mimetype));
+    const invalidFiles = attachments.filter((file) => !ACCEPTED_FILE_MIME_TYPES.includes(file.mimetype));
     if (invalidFiles.length) {
-        const invalidFileNames = invalidFiles.map(file => file.originalname).join(', ');
+        const invalidFileNames = invalidFiles
+            .map((file) => file.originalname)
+            .join(", ");
         return next(new CustomError(`Unsupported file types: ${invalidFileNames}, please provide valid files`, 400));
     }
     const uploadResults = await uploadFilesToCloudinary({ files: attachments });
@@ -39,16 +41,22 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
     if (!uploadResults) {
         return next(new CustomError("Failed to upload files", 500));
     }
-    const attachmentsArray = uploadResults.map(({ secure_url, public_id }) => ({ cloudinaryPublicId: public_id, secureUrl: secure_url }));
+    const attachmentsArray = uploadResults.map(({ secure_url, public_id }) => ({
+        cloudinaryPublicId: public_id,
+        secureUrl: secure_url,
+    }));
     const newMessage = await prisma.message.create({
         data: {
             chatId: chatId,
             senderId: req.user.id,
             attachments: {
                 createMany: {
-                    data: attachmentsArray.map(attachment => ({ cloudinaryPublicId: attachment.cloudinaryPublicId, secureUrl: attachment.secureUrl }))
-                }
-            }
+                    data: attachmentsArray.map((attachment) => ({
+                        cloudinaryPublicId: attachment.cloudinaryPublicId,
+                        secureUrl: attachment.secureUrl,
+                    })),
+                },
+            },
         },
         include: {
             sender: {
@@ -56,17 +64,17 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
                     id: true,
                     username: true,
                     avatar: true,
-                }
+                },
             },
             attachments: {
                 select: {
                     secureUrl: true,
-                }
+                },
             },
             poll: {
                 omit: {
                     id: true,
-                }
+                },
             },
             reactions: {
                 select: {
@@ -74,17 +82,17 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
                         select: {
                             id: true,
                             username: true,
-                            avatar: true
-                        }
+                            avatar: true,
+                        },
                     },
                     reaction: true,
-                }
+                },
             },
         },
         omit: {
             senderId: true,
             pollId: true,
-            audioPublicId: true
+            audioPublicId: true,
         },
     });
     const io = req.app.get("io");
@@ -93,7 +101,7 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
     const updateOrCreateUnreadMessagePromises = otherMembersOfChat.map(({ userId }) => {
         return prisma.unreadMessages.upsert({
             where: {
-                userId_chatId: { userId, chatId: chatId }, // Using the unique composite key
+                userId_chatId: { userId, chatId },
             },
             update: {
                 count: { increment: 1 },
@@ -113,15 +121,20 @@ export const uploadAttachment = asyncErrorHandler(async (req, res, next) => {
         chatId,
         message: {
             attachments: newMessage.attachments.length ? true : false,
-            createdAt: newMessage.createdAt
+            createdAt: newMessage.createdAt,
         },
         sender: {
             id: newMessage.sender.id,
             avatar: newMessage.sender.avatar,
-            username: newMessage.sender.avatar
-        }
+            username: newMessage.sender.username,
+        },
     };
-    emitEventToRoom({ data: unreadMessageData, event: Events.UNREAD_MESSAGE, io, room: chatId });
+    emitEventToRoom({
+        data: unreadMessageData,
+        event: Events.UNREAD_MESSAGE,
+        io,
+        room: chatId,
+    });
     return res.status(201).json({});
 });
 export const fetchAttachments = asyncErrorHandler(async (req, res, next) => {
@@ -131,7 +144,7 @@ export const fetchAttachments = asyncErrorHandler(async (req, res, next) => {
         where: {
             message: {
                 chatId: id,
-            }
+            },
         },
         omit: {
             id: true,
@@ -140,13 +153,19 @@ export const fetchAttachments = asyncErrorHandler(async (req, res, next) => {
         },
         orderBy: {
             message: {
-                createdAt: "desc"
-            }
+                createdAt: "desc",
+            },
         },
         skip: calculateSkip(Number(page), Number(limit)),
-        take: Number(limit)
+        take: Number(limit),
     });
-    const totalAttachmentsCount = await prisma.attachment.count({ where: { message: { chatId: id } } });
+    const totalAttachmentsCount = await prisma.attachment.count({
+        where: {
+            message: {
+                chatId: id,
+            },
+        },
+    });
     const totalPages = Math.ceil(totalAttachmentsCount / Number(limit));
     const payload = {
         attachments,

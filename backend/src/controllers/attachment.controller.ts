@@ -10,112 +10,133 @@ import { CustomError, asyncErrorHandler } from "../utils/error.utils.js";
 import { calculateSkip } from "../utils/generic.js";
 import { emitEventToRoom } from "../utils/socket.util.js";
 
-export const uploadAttachment = asyncErrorHandler(async(req:AuthenticatedRequest,res:Response,next:NextFunction)=>{
+// ✅ Define type for ChatMember used in filter/map
+type ChatMember = { userId: string };
 
-    if(!req.files?.length){
-        return next(new CustomError("Please provide the files",400))
+export const uploadAttachment = asyncErrorHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.files?.length) {
+      return next(new CustomError("Please provide the files", 400));
     }
 
-    const {chatId}:uploadAttachmentSchemaType = req.body
+    const { chatId }: uploadAttachmentSchemaType = req.body;
 
-    if(!chatId){
-        return next(new CustomError("ChatId is required",400))
+    if (!chatId) {
+      return next(new CustomError("ChatId is required", 400));
     }
 
     const isExistingChat = await prisma.chat.findUnique({
-        where:{
-            id:chatId
+      where: {
+        id: chatId,
+      },
+      include: {
+        ChatMembers: {
+          select: {
+            userId: true,
+          },
         },
-        include:{
-            ChatMembers:{
-                select:{
-                  userId:true,
-                }
-            }
-        }
-    })
+      },
+    });
 
-    if(!isExistingChat){
-        return next(new CustomError("Chat not found",404))
+    if (!isExistingChat) {
+      return next(new CustomError("Chat not found", 404));
     }
 
-    const attachments = req.files as Express.Multer.File[]
+    const attachments = req.files as Express.Multer.File[];
 
-    const invalidFiles = attachments.filter(file=>!ACCEPTED_FILE_MIME_TYPES.includes(file.mimetype))
-    
-    if(invalidFiles.length) {
-        const invalidFileNames = invalidFiles.map(file => file.originalname).join(', ');
-        return next(new CustomError(`Unsupported file types: ${invalidFileNames}, please provide valid files`, 400));
+    const invalidFiles = attachments.filter(
+      (file) => !ACCEPTED_FILE_MIME_TYPES.includes(file.mimetype)
+    );
+
+    if (invalidFiles.length) {
+      const invalidFileNames = invalidFiles
+        .map((file) => file.originalname)
+        .join(", ");
+      return next(
+        new CustomError(
+          `Unsupported file types: ${invalidFileNames}, please provide valid files`,
+          400
+        )
+      );
     }
 
-    const uploadResults =  await uploadFilesToCloudinary({files:attachments})
+    const uploadResults = await uploadFilesToCloudinary({ files: attachments });
 
     console.log("Cloudinary Upload Results:", uploadResults);
 
-
-    if(!uploadResults){
-        return next(new CustomError("Failed to upload files",500))
+    if (!uploadResults) {
+      return next(new CustomError("Failed to upload files", 500));
     }
 
-    const attachmentsArray = uploadResults.map(({secure_url,public_id})=>({cloudinaryPublicId:public_id,secureUrl:secure_url}))
+    const attachmentsArray = uploadResults.map(({ secure_url, public_id }) => ({
+      cloudinaryPublicId: public_id,
+      secureUrl: secure_url,
+    }));
 
     const newMessage = await prisma.message.create({
-        data:{
-            chatId:chatId,
-            senderId:req.user.id,
-            attachments:{
-              createMany:{
-                data:attachmentsArray.map(attachment=>({cloudinaryPublicId:attachment.cloudinaryPublicId,secureUrl:attachment.secureUrl}))
-              }
-            }
+      data: {
+        chatId: chatId,
+        senderId: req.user.id,
+        attachments: {
+          createMany: {
+            data: attachmentsArray.map((attachment) => ({
+              cloudinaryPublicId: attachment.cloudinaryPublicId,
+              secureUrl: attachment.secureUrl,
+            })),
+          },
         },
-        include:{
-          sender:{
-            select:{
-              id:true,
-              username:true,
-              avatar:true,
-            }
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
           },
-          attachments:{
-            select:{
-              secureUrl:true,
-            }
+        },
+        attachments: {
+          select: {
+            secureUrl: true,
           },
-          poll:{
-            omit:{
-              id:true,
-            }
+        },
+        poll: {
+          omit: {
+            id: true,
           },
-          reactions:{
-            select:{
-              user:{
-                select:{
-                  id:true,
-                  username:true,
-                  avatar:true
-                }
+        },
+        reactions: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
               },
-              reaction:true,
-            }
+            },
+            reaction: true,
           },
         },
-        omit:{
-          senderId:true,
-          pollId:true,
-          audioPublicId:true
-        },
-    })
+      },
+      omit: {
+        senderId: true,
+        pollId: true,
+        audioPublicId: true,
+      },
+    });
 
+    const io: Server = req.app.get("io");
 
-    const io:Server = req.app.get("io");
-    emitEventToRoom({data:newMessage,event:Events.MESSAGE,io,room:chatId})
-    const otherMembersOfChat = isExistingChat.ChatMembers.filter(({userId}) => req.user.id !== userId);
+    emitEventToRoom({ data: newMessage, event: Events.MESSAGE, io, room: chatId });
 
-    const updateOrCreateUnreadMessagePromises = otherMembersOfChat.map(({ userId }) => {
+    const otherMembersOfChat = isExistingChat.ChatMembers.filter(
+      ({ userId }: ChatMember) => req.user.id !== userId
+    );
+
+    const updateOrCreateUnreadMessagePromises = otherMembersOfChat.map(
+      ({ userId }: ChatMember) => {
         return prisma.unreadMessages.upsert({
           where: {
-            userId_chatId: { userId,chatId: chatId }, // Using the unique composite key
+            userId_chatId: { userId, chatId },
           },
           update: {
             count: { increment: 1 },
@@ -129,62 +150,76 @@ export const uploadAttachment = asyncErrorHandler(async(req:AuthenticatedRequest
             messageId: newMessage.id,
           },
         });
-    });
-      
+      }
+    );
+
     await Promise.all(updateOrCreateUnreadMessagePromises);
 
-    const unreadMessageData = 
-    {
-        chatId,
-        message:{
-            attachments:newMessage.attachments.length ? true : false,
-            createdAt:newMessage.createdAt
-        },
-        sender:{
-            id:newMessage.sender.id,
-            avatar:newMessage.sender.avatar,
-            username:newMessage.sender.avatar
-        }
-    }
+    const unreadMessageData = {
+      chatId,
+      message: {
+        attachments: newMessage.attachments.length ? true : false,
+        createdAt: newMessage.createdAt,
+      },
+      sender: {
+        id: newMessage.sender.id,
+        avatar: newMessage.sender.avatar,
+        username: newMessage.sender.username,
+      },
+    };
 
-    emitEventToRoom({data:unreadMessageData,event:Events.UNREAD_MESSAGE,io,room:chatId})
+    emitEventToRoom({
+      data: unreadMessageData,
+      event: Events.UNREAD_MESSAGE,
+      io,
+      room: chatId,
+    });
+
     return res.status(201).json({});
+  }
+);
 
-})
-
-export const fetchAttachments = asyncErrorHandler(async(req:AuthenticatedRequest,res:Response,next:NextFunction)=>{
-
-    const {id} = req.params
+export const fetchAttachments = asyncErrorHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const { id } = req.params;
     const { page = 1, limit = 6 } = req.query;
 
     const attachments = await prisma.attachment.findMany({
-      where:{
-        message:{
-          chatId:id,
-        }
+      where: {
+        message: {
+          chatId: id,
+        },
       },
-      omit:{
-        id:true,
-        cloudinaryPublicId:true,
-        messageId:true,
+      omit: {
+        id: true,
+        cloudinaryPublicId: true,
+        messageId: true,
       },
-      orderBy:{
-        message:{
-          createdAt:"desc"
-        }
+      orderBy: {
+        message: {
+          createdAt: "desc",
+        },
       },
-      skip:calculateSkip(Number(page),Number(limit)),
-      take:Number(limit)
-    })
+      skip: calculateSkip(Number(page), Number(limit)),
+      take: Number(limit),
+    });
 
-    const totalAttachmentsCount = await prisma.attachment.count({where:{message:{chatId:id}}})
-    const totalPages =  Math.ceil(totalAttachmentsCount/Number(limit))
+    const totalAttachmentsCount = await prisma.attachment.count({
+      where: {
+        message: {
+          chatId: id,
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalAttachmentsCount / Number(limit));
 
     const payload = {
       attachments,
       totalAttachmentsCount,
       totalPages,
-    }
-    
+    };
+
     res.status(200).json(payload);
-})
+  }
+);
