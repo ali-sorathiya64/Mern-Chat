@@ -3,21 +3,18 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js", 
+  "main": "build/index.js",
   "scripts": {
-    "start": "NODE_ENV=production node -r tsconfig-paths/register build/index.js",
-    "dev": "concurrently \"tsc -w\" \"cross-env NODE_ENV=development nodemon build/index.js\"",
-    "ts.check": "tsc --noEmit",
-    "build": "rimraf build && tsc && prisma generate --schema=src/prisma/schema.prisma",
-    "prestart": "npm run build",
-    "predev": "npm run build"
+    "start": "NODE_ENV=PRODUCTION node build/index.js",
+    "dev": "concurrently \"tsc -w\" \"cross-env NODE_ENV=DEVELOPMENT nodemon build/index.js\"",
+    "ts.check": "tsc --project tsconfig.json",
+    "build": "rimraf build && tsc && prisma generate --schema=src/prisma/schema.prisma"
   },
   "pre-commit": [
     "ts.check",
-    "build"
+    "build",
+    "add-build"
   ],
-
-
   "keywords": [],
   "author": "",
   "license": "ISC",
