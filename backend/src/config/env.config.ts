@@ -7,8 +7,8 @@ const developmentConfig:IConfig = {
 }
 
 const productionConfig:IConfig = {
-    clientUrl:"https://mernchat.in",
-    callbackUrl:"https://aesehi.online/api/v1/auth/google/callback"
+    clientUrl:"http://localhost:3000",
+    callbackUrl:"https://mern-chat-3-ak2b.onrender.com/api/v1/auth/google/callback"
 }
 
 export const config = env.NODE_ENV==='DEVELOPMENT'?developmentConfig:productionConfig
