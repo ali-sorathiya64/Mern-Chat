@@ -32,7 +32,7 @@ export const Navbar = () => {
         <h4 className="text-3xl font-Shantell-Sans font-medium max-sm:text-xl">
           Mern Chat
         </h4>
-        <a href="https://github.com/RishiBakshii/mern-chat" target="_blank">
+        <a href="https://github.com/ali-sorathiya64/Mern-Chat" target="_blank">
           <GithubIcon/>
         </a>
       </div>

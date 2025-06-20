@@ -7,9 +7,7 @@ export const useSwipe = (
   onLeftSwipe: CallableFunction,
   onRightSwipe: CallableFunction
 ) => {
-  // Ensure `useMediaQuery` is safe for SSR
-  const isTargetScreen =
-    typeof window !== "undefined" ? useMediaQuery(screenWidthThreshold) : false;
+  const isTargetScreen = useMediaQuery(screenWidthThreshold); // always called
 
   const [swipe, setSwipe] = useState({
     moved: false,
@@ -47,6 +45,7 @@ export const useSwipe = (
 
   const emptyFunction = () => {};
 
+  // ✅ Conditionally assign handlers AFTER all hooks are called
   return {
     onTouchStart: isTargetScreen ? onTouchStart : emptyFunction,
     onTouchMove: isTargetScreen ? onTouchMove : emptyFunction,

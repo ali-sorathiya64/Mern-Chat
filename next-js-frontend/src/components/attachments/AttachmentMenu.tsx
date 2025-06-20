@@ -1,6 +1,6 @@
 import { ACCEPTED_FILE_MIME_TYPES } from "@/constants";
 import { useHandleSelectFileAttachments } from "@/hooks/useAttachment/useHandleSelectFileAttachments";
-import { useTogglePollForm } from "@/hooks/useUI/useTogglePollForm";
+import { useTogglePollForm } from "@/hooks/useUI/useTogglePollForm"; 
 import { motion } from "framer-motion";
 import { GalleryIcon } from "../ui/icons/GalleryIcon";
 import { PollingIcon } from "../ui/icons/PollingIcon";
@@ -17,10 +17,9 @@ export const AttachmentMenu = ({
   setSelectedAttachments,
 }: PropTypes) => {
   const { togglePollForm } = useTogglePollForm();
-
   const ref = useRef<HTMLDivElement>(null);
 
-  useHandleOutsideClick(ref,()=>setAttachmentsMenuOpen(false));
+  useHandleOutsideClick(ref, () => setAttachmentsMenuOpen(false));
 
   const handlePollClick = () => {
     setAttachmentsMenuOpen(false);
@@ -63,7 +62,6 @@ export const AttachmentMenu = ({
         <PollingIcon />
         <p className="text-text">Poll</p>
       </div>
-      
     </motion.div>
   );
 };

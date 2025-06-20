@@ -1,4 +1,5 @@
 'use client';
+// import { useToggleChatDetailsBar } from "@/hooks/useUi/useToggleChatDetailsBar";
 import { useToggleChatDetailsBar } from "@/hooks/useUI/useToggleChatDetailsBar";
 import { fetchUserChatsResponse, FetchUserInfoResponse } from "@/lib/server/services/userService";
 import { SharedMedia } from "../attachments/SharedMedia";

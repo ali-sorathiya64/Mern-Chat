@@ -2,49 +2,49 @@ import { Navbar } from "@/components/navbar/Navbar";
 import { MessageInputProvider } from "@/context/message-input-ref.context";
 import { Metadata } from "next";
 
-export const metadata:Metadata = {
-   
-
-  title: "Mernchat - Secure & Encrypted Chat App",
-  description: "Mernchat is a privacy-first chat app offering end-to-end encryption for private chats and secure real-time messaging.",
-  keywords: ["Mernchat","secure chat","end-to-end encryption","private messaging","chat app","encrypted chat app","secure messaging","privacy-focused chat","real-time chat","secure communication","instant messaging","chat application","E2EE messaging","secure group chats","encrypted conversations","safe messaging app"],
-  generator:"Next.js",
-  applicationName: "Mernchat",
-  authors: [{ name: "Rishi Bakshi", url: "https://rishibakshii.github.io/portfolio" }],
-  creator: "Rishi Bakshi",
-  publisher: "Rishi Bakshi",
-  metadataBase: new URL("https://mernchat.in"),
+export const metadata: Metadata = {
+  title: "Secure Chat App",
+  description: "A privacy-first chat application with end-to-end encryption",
+  keywords: [
+    "secure chat",
+    "end-to-end encryption",
+    "private messaging",
+    "chat app",
+    "encrypted chat",
+    "secure messaging",
+    "real-time chat"
+  ],
+  generator: "Next.js",
+  metadataBase: new URL("https://yourdomain.com"), // Replace with your domain
 
   openGraph: {
-    title: "Mernchat - Secure & Encrypted Chat App",
-    description: "Mernchat is a privacy-first chat app offering end-to-end encryption for private chats and secure real-time messaging.",
-    url: "https://mernchat.in",
-    siteName: "Mernchat",
+    title: "Secure Chat App",
+    description: "A privacy-first chat application with end-to-end encryption",
+    url: "https://yourdomain.com",
+    siteName: "Secure Chat",
     images: [
       {
-        url: "https://mernchat.in/images/og/og-image.png", // Static path from public folder
+        url: "https://yourdomain.com/images/og/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Mernchat - Secure & Encrypted Chat App",
+        alt: "Secure Chat Application",
       },
     ],
     type: "website",
-    locale: "en_US", // Helps in localization
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mernchat - Secure & Encrypted Chat App",
-    description: "Mernchat is a privacy-first chat app offering end-to-end encryption for private chats and secure real-time messaging.",
-    images: ["https://mernchat.in/images/og/og-image.png"],
-    creator:"@rishibakshii",
-    site: "@rishibakshii",
+    title: "Secure Chat App",
+    description: "A privacy-first chat application with end-to-end encryption",
+    images: ["https://yourdomain.com/images/og/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: "https://mernchat.in",
+    canonical: "https://yourdomain.com",
   },
 };
 
