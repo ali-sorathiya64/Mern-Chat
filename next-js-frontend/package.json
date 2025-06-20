@@ -2,17 +2,18 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "db:push:dev": "dotenv -e .env.development -- npx prisma db push",
-    "db:push:prod": "dotenv -e .env.production -- npx prisma db push",
-    "migrate:dev": "dotenv -e .env.development -- npx prisma migrate deploy",
-    "migrate:prod": "dotenv -e .env.production -- npx prisma migrate deploy"
-  },
-  "dependencies": {
+ "scripts": {
+  "dev": "next dev --turbopack",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "db:push:dev": "dotenv -e .env.development -- npx prisma db push",
+  "db:push:prod": "dotenv -e .env.production -- npx prisma db push",
+  "migrate:dev": "dotenv -e .env.development -- npx prisma migrate deploy",
+  "migrate:prod": "dotenv -e .env.production -- npx prisma migrate deploy",
+  "postinstall": "prisma generate"
+},
+ "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.3.1",
     "@reduxjs/toolkit": "^2.5.0",
