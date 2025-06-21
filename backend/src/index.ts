@@ -21,64 +21,55 @@ import userRoutes from './routes/user.router.js'
 import { socketAuthenticatorMiddleware } from './middlewares/socket-auth.middleware.js'
 import registerSocketHandlers from './socket/socket.js'
 
-// ✅ Validate environment variables
-checkEnvVariables()
 
-const app = express()
-const server = createServer(app)
+// environment variables validation
+checkEnvVariables();
 
-// ✅ Allow CORS from localhost only (for development)
-const allowedOrigins = ['http://localhost:3000']
+const app=express()
+const server=createServer(app)
+const io=new Server(server,{cors:{credentials:true,origin:config.clientUrl}})
 
-// ✅ Socket.io server setup with proper CORS config
-const io = new Server(server, {
-  cors: {
-    credentials: true,
-    origin: allowedOrigins
-  }
-})
+// global
+app.set("io",io)
 
-// ✅ Attach io globally
-app.set('io', io)
+// userSocketIds
+export const userSocketIds = new Map<string,string>()
 
-// ✅ Map to store user socket ids
-export const userSocketIds = new Map<string, string>()
-
-// ✅ Global middlewares
-app.use(cors({ credentials: true, origin: allowedOrigins }))
+// middlewares
+app.use(cors({credentials:true,origin:config.clientUrl}))
 app.use(passport.initialize())
 app.use(express.json())
 app.use(cookieParser())
 app.use(morgan('tiny'))
 
-// ✅ API route handlers
-app.use('/api/v1/auth', authRoutes)
-app.use('/api/v1/chat', chatRoutes)
-app.use('/api/v1/user', userRoutes)
-app.use('/api/v1/request', requestRoutes)
-app.use('/api/v1/message', messageRoutes)
-app.use('/api/v1/attachment', attachmentRoutes)
 
-// ✅ Socket auth middleware
+// route middlewares
+app.use("/api/v1/auth",authRoutes)
+app.use("/api/v1/chat",chatRoutes)
+app.use("/api/v1/user",userRoutes)
+app.use("/api/v1/request",requestRoutes)
+app.use("/api/v1/message",messageRoutes)
+app.use("/api/v1/attachment",attachmentRoutes)
+
 io.use(socketAuthenticatorMiddleware)
 
-// ✅ Health check route
-app.get('/', (_: Request, res: Response) => {
-  res.status(200).json({ running: true })
+
+app.get("/",(_:Request,res:Response)=>{
+    res.status(200).json({running:true})
 })
 
-// ✅ Error middleware
+// error middleware
 app.use(errorMiddleware)
 
-// ✅ Register socket events
-registerSocketHandlers(io)
+// Register Socket.IO event handlers
+registerSocketHandlers(io);
 
-// ✅ Start server
-server.listen(env.PORT, () => {
-  console.log(`server [STARTED] ~ http://localhost:${env.PORT}`)
-  if (env.NODE_ENV === 'PRODUCTION') {
-    console.log('Started in PRODUCTION mode')
-  } else {
-    console.log('Started in DEVELOPMENT mode')
-  }
+server.listen(env.PORT,()=>{
+    console.log(`server [STARTED] ~ http://localhost:${env.PORT}`);
+    if(env.NODE_ENV==='PRODUCTION'){
+        console.log('Started in PRODUCTION mode');
+    }
+    else{
+        console.log('Started in DEVELOPMENT mode');
+    }
 })

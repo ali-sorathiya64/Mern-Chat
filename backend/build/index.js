@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import passport from 'passport';
 import { Server } from 'socket.io';
 import './config/cloudinary.config.js';
+import { config } from './config/env.config.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import './passport/google.strategy.js';
 import { checkEnvVariables, env } from './schemas/env.schema.js';
@@ -17,47 +18,36 @@ import requestRoutes from './routes/request.router.js';
 import userRoutes from './routes/user.router.js';
 import { socketAuthenticatorMiddleware } from './middlewares/socket-auth.middleware.js';
 import registerSocketHandlers from './socket/socket.js';
-// ✅ Validate environment variables
+// environment variables validation
 checkEnvVariables();
 const app = express();
 const server = createServer(app);
-// ✅ Allow CORS from localhost only (for development)
-const allowedOrigins = ['http://localhost:3000'];
-// ✅ Socket.io server setup with proper CORS config
-const io = new Server(server, {
-    cors: {
-        credentials: true,
-        origin: allowedOrigins
-    }
-});
-// ✅ Attach io globally
-app.set('io', io);
-// ✅ Map to store user socket ids
+const io = new Server(server, { cors: { credentials: true, origin: config.clientUrl } });
+// global
+app.set("io", io);
+// userSocketIds
 export const userSocketIds = new Map();
-// ✅ Global middlewares
-app.use(cors({ credentials: true, origin: allowedOrigins }));
+// middlewares
+app.use(cors({ credentials: true, origin: config.clientUrl }));
 app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('tiny'));
-// ✅ API route handlers
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/chat', chatRoutes);
-app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/request', requestRoutes);
-app.use('/api/v1/message', messageRoutes);
-app.use('/api/v1/attachment', attachmentRoutes);
-// ✅ Socket auth middleware
+// route middlewares
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/request", requestRoutes);
+app.use("/api/v1/message", messageRoutes);
+app.use("/api/v1/attachment", attachmentRoutes);
 io.use(socketAuthenticatorMiddleware);
-// ✅ Health check route
-app.get('/', (_, res) => {
+app.get("/", (_, res) => {
     res.status(200).json({ running: true });
 });
-// ✅ Error middleware
+// error middleware
 app.use(errorMiddleware);
-// ✅ Register socket events
+// Register Socket.IO event handlers
 registerSocketHandlers(io);
-// ✅ Start server
 server.listen(env.PORT, () => {
     console.log(`server [STARTED] ~ http://localhost:${env.PORT}`);
     if (env.NODE_ENV === 'PRODUCTION') {
