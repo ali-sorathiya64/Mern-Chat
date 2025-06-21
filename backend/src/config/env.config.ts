@@ -7,7 +7,7 @@ const developmentConfig:IConfig = {
 }
 
 const productionConfig:IConfig = {
-    clientUrl:"http://localhost:3000",
+    clientUrl:"https://mernendtoendchatapp.vercel.app/",
     callbackUrl:"https://mern-chat-3-ak2b.onrender.com/api/v1/auth/google/callback"
 }
 
