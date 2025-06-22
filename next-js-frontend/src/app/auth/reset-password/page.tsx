@@ -18,7 +18,7 @@ const metadata: Metadata = {
   openGraph: {
     title: "Reset Password - Mernchat",
     description: "Securely reset your password on Mernchat and regain access to your account.",
-    url: "https://mernchat.in/auth/reset-password",
+    url: "https://mernendtoendchatapp.vercel.app/auth/reset-password",
     siteName: "Mernchat",
     type: "website",
   },
