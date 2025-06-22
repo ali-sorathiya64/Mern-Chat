@@ -10,8 +10,10 @@ import { config } from './config/env.config.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import './passport/google.strategy.js';
 import { checkEnvVariables, env } from './schemas/env.schema.js';
+// Import socket auth and socket event handlers
 import { socketAuthenticatorMiddleware } from './middlewares/socket-auth.middleware.js';
 import registerSocketHandlers from './socket/socket.js';
+// Route imports
 import attachmentRoutes from './routes/attachment.router.js';
 import authRoutes from './routes/auth.router.js';
 import chatRoutes from './routes/chat.router.js';
@@ -34,12 +36,13 @@ const corsOptions = {
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
-        console.warn(`Blocked by CORS: ${origin}`);
+        console.warn(`❌ Blocked by CORS: ${origin}`);
         return callback(new Error('Not allowed by CORS'));
     },
-    credentials: true,
+    credentials: true, // ✅ Needed for cookies or Authorization headers
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie'],
+    exposedHeaders: ['Authorization'],
 };
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
@@ -54,19 +57,25 @@ const io = new Server(server, {
     pingTimeout: 60000,
     path: '/socket.io'
 });
+// Socket.IO Middleware
 io.use(socketAuthenticatorMiddleware);
+// Global IO access
 app.set('io', io);
 export const userSocketIds = new Map();
+// Middleware
 app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('tiny'));
+// Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/request', requestRoutes);
 app.use('/api/v1/message', messageRoutes);
 app.use('/api/v1/attachment', attachmentRoutes);
+
+
 app.get('/', (_, res) => {
     res.status(200).json({
         status: 'running',
@@ -74,16 +83,24 @@ app.get('/', (_, res) => {
         allowedOrigins
     });
 });
+
+
 app.use(errorMiddleware);
+
 registerSocketHandlers(io);
+
+
 server.listen(env.PORT, () => {
     console.log(`Server running on http://localhost:${env.PORT}`);
     console.log(`Environment: ${env.NODE_ENV}`);
     console.log(`Allowed CORS origins: ${allowedOrigins.join(', ')}`);
 });
+
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
 });
+
+
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
 });
